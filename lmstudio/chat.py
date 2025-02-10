@@ -4,7 +4,7 @@ import typer
 import json
 import logging
 
-import helpers
+import lmstudio.helpers as helpers
 
 
 logger = logging.getLogger(__name__)

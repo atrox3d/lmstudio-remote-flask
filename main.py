@@ -1,7 +1,7 @@
 import typer
 import logging
-import chat
-import helpers
+import lmstudio.chat as chat
+import lmstudio.helpers as helpers
 
 
 logger = logging.getLogger(__name__)
