@@ -36,7 +36,7 @@ def chat(
     }
 
 
-    stream = False  # disable streaming for now, returns a 500 error
+    # stream = False  # disable streaming for now, returns a 500 error
 
 
     response = requests.post(url, json=data, headers=headers)
