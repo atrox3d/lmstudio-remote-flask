@@ -6,7 +6,8 @@ cli = typer.Typer(add_completion=False)
 app = Flask(__name__)
 
 SERVER_IP = 'localhost'
-LM_STUDIO_URL = f"http://{SERVER_IP}:1234/v1/completions"
+LM_STUDIO_URL = f"http://{SERVER_IP}:1234/v1/completions"           # openAI, deprecated
+LM_STUDIO_URL = f"http://{SERVER_IP}:1234/api/v0/chat/completions"  # LM Studio
 
 
 @app.route("/chat", methods=["POST"])
