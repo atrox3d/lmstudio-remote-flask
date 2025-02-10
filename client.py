@@ -1,5 +1,6 @@
 import json
 from operator import add
+from flask.cli import F
 import requests
 import typer
 
@@ -34,19 +35,33 @@ def chat(
         'stream': stream
     }
 
-    {
-        "model": "meta-llama-3.1-8b-instruct",
-        "prompt": user_prompt,
-        "max_tokens": 100,
-        "temperature": 0.5,
-        "top_p": 0.9,
-        "n": 1,
-        "stop": None    
-    }
+
+    stream = False  # disable streaming for now, returns a 500 error
+
 
     response = requests.post(url, json=data, headers=headers)
+    print(f'response: {response}')
+
+    response.raise_for_status()
+
+    if stream:
+        if response.status_code == 200:
+            for chunk in response.iter_lines(decode_unicode=True):
+                print(f'Chunk: {chunk}')
+                if chunk and chunk.strip():
+                    try:
+                        # print(json.loads(chunk))
+                        pass
+                    except json.JSONDecodeError as e:
+                        print(f"Failed to parse JSON: {e}")
+                else:
+                    break
+        else:
+            print(f"request failed with status code {response.status_code}")
+    else:
     # print(json.dumps(response.json(), indent=4))
     # print(response.json()['choices'][0]['text'])
-    print(response.json()['choices'][0]['message']['content'])
+        print(response.json()['choices'][0]['message']['content'])
+
 if __name__ == "__main__":
     app()
