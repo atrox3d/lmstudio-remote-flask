@@ -1,7 +1,11 @@
 import json
+from typing import Literal
 import requests
 import typer
 import logging
+
+import helpers
+
 
 logger = logging.getLogger(__name__)
 app = typer.Typer(add_completion=False)
@@ -11,7 +15,7 @@ SERVER_IP = '192.168.1.10'
 PORT = 1234
 # LM_STUDIO_URL = f"http://{SERVER_IP}:1234/v1/completions"           # openAI, deprecated
 # LM_STUDIO_URL = f"http://{SERVER_IP}:1234/api/v0/chat/completions"  # LM Studio (beta)
-# LM_STUDIO_URL = f"http://{SERVER_IP}:1234/v1/chat/completions"      # openAI, deprecated
+# LM_STUDIO_URL = f"http://{SERVER_IP}:1234/v1/chat/completions"      # openAI
 MODEL = 'meta-llama-3.1-8b-instruct'
 
 
@@ -23,27 +27,19 @@ def chat(
     max_tokens    : int = -1,
     stream        : bool = False,
     host          : str = SERVER_IP, 
-    port          : int = PORT
+    port          : int = PORT,
+    urlschema      : helpers.Url = typer.Option(helpers.Url.openai, help="Endpoint to connect to")
 ):
-    url = f"http://{host}:{port}/v1/chat/completions"
-    
+    # url = f"http://{host}:{port}/v1/chat/completions"
+    url = helpers.get_url(urlschema, host, port)
     headers = {"Content-Type": "application/json"}
-    data1 = {
-        'model': 'meta-llama-3.1-8b-instruct',
-        'messages': [
-            {
-                'role': 'system', 
-                'content': system_prompt
-            },
-            {
-                'role': 'user', 
-                'content': user_prompt
-            }
-        ],
-        'temperature': temperature,
-        'max_tokens': max_tokens,
-        'stream': stream
-    }
+    data1 = helpers.get_payload(
+        user_prompt, 
+        system_prompt, MODEL, 
+        temperature, 
+        max_tokens, 
+        stream
+    )
     
     data = data1
     logger.info(f"Connecting to {url}")
