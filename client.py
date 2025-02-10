@@ -30,37 +30,39 @@ def chat(
     port          : int = PORT,
     urlschema      : helpers.Url = typer.Option(helpers.Url.openai, help="Endpoint to connect to")
 ):
-    # url = f"http://{host}:{port}/v1/chat/completions"
     url = helpers.get_url(urlschema, host, port)
     headers = {"Content-Type": "application/json"}
-    data1 = helpers.get_payload(
+    payload = helpers.get_payload(
         user_prompt, 
         system_prompt, MODEL, 
         temperature, 
         max_tokens, 
         stream
     )
-    
-    data = data1
+    logger.debug(f'payload: {payload}')
     logger.info(f"Connecting to {url}")
-    response = requests.post(url, json=data, headers=headers, stream=stream)
+    response = requests.post(url, json=payload, headers=headers, stream=stream)
     response.raise_for_status()
 
     if stream:
         print('streaming...')
         for chunk in response.iter_lines(decode_unicode=True):
-            if chunk.replace('data: ', ''):
+            logger.debug(f"chunk: {chunk}")
+            if (chunk := chunk.replace('data: ', '')) and chunk != '[DONE]':
                 try:
                     delta = json.loads(chunk)['choices'][0]['delta']
                     if delta:
                         print(delta['content'], end='')
                 except json.JSONDecodeError as e:
                     logger.error(f"Error: {e}")
+                    logger.error(f'chunk: {chunk}')
                     continue
             else:
                 continue
+        print()
     else:
         print(response.json()['choices'][0]['message']['content'])
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
