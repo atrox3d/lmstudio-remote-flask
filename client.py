@@ -16,6 +16,9 @@ def chat(
     host: str = "localhost", 
     port: int = 5000
 ):
+    stream = False  # disable streaming for now, returns a 500 error
+    print(f'ignore stream: {stream}')
+    
     url = f"http://{host}:{port}/chat"
     headers = {"Content-Type": "application/json"}
     data = {
@@ -35,29 +38,20 @@ def chat(
         'stream': stream
     }
 
-
-    # stream = False  # disable streaming for now, returns a 500 error
-
-
     response = requests.post(url, json=data, headers=headers)
-    print(f'response: {response}')
-
     response.raise_for_status()
 
     if stream:
-        if response.status_code == 200:
-            for chunk in response.iter_lines(decode_unicode=True):
-                print(f'Chunk: {chunk}')
-                if chunk and chunk.strip():
-                    try:
-                        # print(json.loads(chunk))
-                        pass
-                    except json.JSONDecodeError as e:
-                        print(f"Failed to parse JSON: {e}")
-                else:
-                    break
-        else:
-            print(f"request failed with status code {response.status_code}")
+        for chunk in response.iter_lines(decode_unicode=True):
+            print(f'Chunk: {chunk}')
+            if chunk and chunk.strip():
+                try:
+                    # print(json.loads(chunk))
+                    pass
+                except json.JSONDecodeError as e:
+                    print(f"Failed to parse JSON: {e}")
+            else:
+                break
     else:
     # print(json.dumps(response.json(), indent=4))
     # print(response.json()['choices'][0]['text'])
