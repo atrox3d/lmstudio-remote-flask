@@ -28,8 +28,10 @@ def chat(
     stream        : bool = False,
     host          : str = SERVER_IP, 
     port          : int = PORT,
-    urlschema      : helpers.Url = typer.Option(helpers.Url.openai, help="Endpoint to connect to")
+    urlschema     : helpers.Url = typer.Option(helpers.Url.openai, help="Endpoint to connect to"),
+    loglevel      : helpers.LogLevelsEnum = typer.Option(helpers.LogLevelsEnum.INFO, help="Logging level")
 ):
+    logging.basicConfig(level=loglevel)
     url = helpers.get_url(urlschema, host, port)
     headers = {"Content-Type": "application/json"}
     payload = helpers.get_payload(
@@ -65,5 +67,4 @@ def chat(
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     app()

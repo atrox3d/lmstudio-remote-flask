@@ -1,4 +1,14 @@
-from enum import Enum
+from enum import Enum, StrEnum
+import logging
+
+# get logging levels mapping
+_loglevels = logging.getLevelNamesMapping()
+
+# create list of level, level tuples
+_choices = list(zip(_loglevels, _loglevels))
+
+# create enum type for main callback option
+LogLevelsEnum = StrEnum('LogLevels', _choices)
 
 
 class Url(str, Enum):
